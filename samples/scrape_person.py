@@ -3,7 +3,8 @@ from linkedin_scraper import Person, actions
 from selenium import webdriver
 driver = webdriver.Chrome("./chromedriver")
 
-email = os.getenv("LINKEDIN_USER")
-password = os.getenv("LINKEDIN_PASSWORD")
+email = "pawan1995219@gmail.com"
+password = "pawansharma999"
 actions.login(driver, email, password) # if email and password isnt given, it'll prompt in terminal
-person = Person("https://www.linkedin.com/in/andre-iguodala-65b48ab5", driver=driver)
+person = Person("https://www.linkedin.com/in/pawan-kumar-sharma-b179621bb", driver=driver)
+print(person)
