@@ -1,7 +1,8 @@
 import os
 from linkedin_scraper import Person, actions
 from selenium import webdriver
-driver = webdriver.Chrome("./chromedriver")
+# driver = webdriver.Chrome("../chromedriver")
+driver = webdriver.Chrome(executable_path='/Users/sushil/Documents/exec/chromedriver/chromedriver')
 
 email = "pawan1995219@gmail.com"
 password = "pawansharma999"

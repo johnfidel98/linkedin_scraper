@@ -80,7 +80,7 @@ class Company(Scraper):
         return "\n".join(elem.text.split("\n")[1:])
 
     def __get_text_under_subtitle_by_class(self, driver, class_name):
-        return self.__get_text_under_subtitle(driver.find_element_by_class_name(class_name))
+        return self.__get_text_under_subtitle(driver.find_element(By.CLASS_NAME, class_name))
 
     def scrape(self, get_employees=True, close_on_complete=True):
         if self.is_signed_in():
@@ -95,11 +95,11 @@ class Company(Scraper):
             employee_object = {}
             employee_object['name'] = (employee_raw.text.split("\n") or [""])[0].strip()
             employee_object['designation'] = (employee_raw.text.split("\n") or [""])[3].strip()
-            employee_object['linkedin_url'] = employee_raw.find_element_by_tag_name("a").get_attribute("href")
+            employee_object['linkedin_url'] = employee_raw.find_element(By.TAG_NAME, "a").get_attribute("href")
             # print(employee_raw.text, employee_object)
             # _person = Person(
-            #     # linkedin_url = employee_raw.find_element_by_tag_name("a").get_attribute("href"),
-            #     linkedin_url = employee_raw.find_element_by_tag_name("a").get_attribute("href"),
+            #     # linkedin_url = employee_raw.find_element(By.TAG_NAME, "a").get_attribute("href"),
+            #     linkedin_url = employee_raw.find_element(By.TAG_NAME, "a").get_attribute("href"),
             #     name = (employee_raw.text.split("\n") or [""])[0].strip(),
             #     driver = self.driver,
             #     get = True,
@@ -156,7 +156,7 @@ class Company(Scraper):
         results_li_len = len(results_li)
         while is_loaded(results_li_len):
             try:
-                driver.find_element_by_xpath(next_xpath).click()
+                driver.find_element(By.XPATH, next_xpath).click()
             except:
                 pass
             _ = WebDriverWait(driver, wait_time).until(EC.presence_of_element_located((By.CLASS_NAME, list_css)))
@@ -294,7 +294,7 @@ class Company(Scraper):
 
         # get showcase
         try:
-            driver.find_element_by_id("view-other-showcase-pages-dialog").click()
+            driver.find_element(By.ID, "view-other-showcase-pages-dialog").click()
             WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, 'dialog')))
 
             showcase_pages = driver.find_elements(By.CLASS_NAME,"company-showcase-pages")[1]

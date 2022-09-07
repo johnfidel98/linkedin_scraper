@@ -156,7 +156,7 @@ class Person(Scraper):
             _ = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
                 EC.presence_of_element_located((By.ID, "experience-section"))
             )
-            exp = driver.find_element_by_id("experience-section")
+            exp = driver.find_element(By.ID, "experience-section")
         except:
             exp = None
 
@@ -198,7 +198,7 @@ class Person(Scraper):
                 self.add_experience(experience)
 
         # get location
-        location = driver.find_element_by_class_name(f"{self.__TOP_CARD}--list-bullet")
+        location = driver.find_element(By.CLASS_NAME, f"{self.__TOP_CARD}--list-bullet")
         location = location.find_element(By.TAG_NAME,"li").text
         self.add_location(location)
 
@@ -305,8 +305,8 @@ class Person(Scraper):
                 for conn in connections.find_elements(By.CLASS_NAME,"mn-connection-card"):
                     anchor = conn.find_element(By.CLASS_NAME,"mn-connection-card__link")
                     url = anchor.get_attribute("href")
-                    name = conn.find_element(By.CLASS_NAME,"mn-connection-card__details").find_element_by_class_name("mn-connection-card__name").text.strip()
-                    occupation = conn.find_element(By.CLASS_NAME,"mn-connection-card__details").find_element_by_class_name("mn-connection-card__occupation").text.strip()
+                    name = conn.find_element(By.CLASS_NAME,"mn-connection-card__details").find_element(By.CLASS_NAME, "mn-connection-card__name").text.strip()
+                    occupation = conn.find_element(By.CLASS_NAME,"mn-connection-card__details").find_element(By.CLASS_NAME, "mn-connection-card__occupation").text.strip()
 
                     contact = Contact(name=name, occupation=occupation, url=url)
                     self.add_contact(contact)
