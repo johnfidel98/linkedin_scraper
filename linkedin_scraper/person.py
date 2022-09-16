@@ -95,7 +95,7 @@ class Person(Scraper):
             _ = WebDriverWait(self.driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
                 EC.presence_of_element_located((By.CLASS_NAME, class_name))
             )
-            div = self.driver.find_element(By.CLASS_NAME,"class_name")
+            div = self.driver.find_element(By.CLASS_NAME, class_name)
             div.find_element(By.TAG_NAME,"button").click()
         except Exception as e:
             pass
@@ -113,7 +113,7 @@ class Person(Scraper):
             )
         )
 
-        self.name = root.find_element(By.CLASS_NAME,"selectors.NAME").text.strip()
+        self.name = root.find_element(By.CLASS_NAME, selectors.NAME).text.strip()
 
         # get about
         try:
@@ -121,7 +121,7 @@ class Person(Scraper):
                 EC.presence_of_element_located(
                     (
                         By.XPATH,
-                        "//*[@class='lt-line-clamp__more']",
+                        "//*[@class='inline-show-more-text__button']",
                     )
                 )
             )
@@ -130,8 +130,8 @@ class Person(Scraper):
             about = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
                 EC.presence_of_element_located(
                     (
-                        By.XPATH,
-                        "//*[@class='lt-line-clamp__raw-line']",
+                        By.CSS_SELECTOR,
+                        "#ember74 .pv-shared-text-with-see-more",
                     )
                 )
             )
@@ -149,50 +149,44 @@ class Person(Scraper):
             "window.scrollTo(0, Math.ceil(document.body.scrollHeight*3/5));"
         )
 
-        ## Click SEE MORE
-        self._click_see_more_by_class_name("pv-experience-section__see-more")
+        ## todo Click SEE MORE
+        """
+        try:
+            see_more_experience = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
+                EC.presence_of_element_located(
+                    (
+                        By.CSS_SELECTOR,
+                        '#experience + div + div.pvs-list__outer-container div.pvs-list__footer-wrapper a',
+                    )
+                )
+            )
+            driver.execute_script("arguments[0].click();", see_more_experience)
+            in_enperience = True
+        except:
+            in_enperience = False
+        """
 
         try:
             _ = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
-                EC.presence_of_element_located((By.ID, "experience-section"))
+                EC.presence_of_element_located((By.ID, "experience"))
             )
-            exp = driver.find_element(By.ID, "experience-section")
+            exp = driver.find_element(By.ID, "experience")
         except:
             exp = None
 
         if exp is not None:
-            for position in exp.find_elements(By.CLASS_NAME,"pv-position-entity"):
-                position_title = position.find_element(By.TAG_NAME,"h3").text.strip()
+            for position in driver.find_elements(By.CSS_SELECTOR, "#experience + div + div.pvs-list__outer-container li.artdeco-list__item"):
+                position_title = position.find_element(By.CSS_SELECTOR,"span.mr1").text.strip()
 
                 try:
-                    company = position.find_elements(By.TAG_NAME,"p")[1].text.strip()
-                    times = str(
-                        position.find_elements(By.TAG_NAME,"h4")[0]
-                        .find_elements(By.TAG_NAME,"span")[1]
-                        .text.strip()
-                    )
-                    from_date = " ".join(times.split(" ")[:2])
-                    to_date = " ".join(times.split(" ")[3:])
-                    duration = (
-                        position.find_elements(By.TAG_NAME,"h4")[1]
-                        .find_elements(By.TAG_NAME,"span")[1]
-                        .text.strip()
-                    )
-                    location = (
-                        position.find_elements(By.TAG_NAME,"h4")[2]
-                        .find_elements(By.TAG_NAME,"span")[1]
-                        .text.strip()
-                    )
+                    company = position.find_element(By.CSS_SELECTOR,"span.t-14").text.strip()
+                    duration = position.find_element(By.CSS_SELECTOR,"span.t-14.t-black--light").text.strip()
                 except:
-                    company = None
-                    from_date, to_date, duration, location = (None, None, None, None)
+                    company, duration = None, None
 
                 experience = Experience(
                     position_title=position_title,
-                    from_date=from_date,
-                    to_date=to_date,
-                    duration=duration,
-                    location=location,
+                    duration=duration
                 )
                 experience.institution_name = company
                 self.add_experience(experience)
@@ -208,32 +202,26 @@ class Person(Scraper):
 
         # get education
         ## Click SEE MORE
-        self._click_see_more_by_class_name("pv-education-section__see-more")
+        # self._click_see_more_by_class_name("pv-education-section__see-more")
         try:
             _ = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
-                EC.presence_of_element_located((By.ID, "education-section"))
+                EC.presence_of_element_located((By.ID, "education"))
             )
-            edu = driver.find_element(By.ID,"education-section")
+            edu = driver.find_element(By.ID,"education")
         except:
             edu = None
         if edu:
-            for school in edu.find_elements(By.CLASS_NAME,
-                "pv-profile-section__list-item"
+            for school in edu.find_elements(By.CSS_SELECTOR,
+                "#education + div + div.pvs-list__outer-container li.artdeco-list__item"
             ):
                 university = school.find_element(By.CLASS_NAME,
-                    "pv-entity__school-name"
+                    "span.mr1"
                 ).text.strip()
 
                 try:
-                    degree = (
-                        school.find_element(By.CLASS_NAME,"pv-entity__degree-name")
-                        .find_elements(By.TAG_NAME,"span")[1]
-                        .text.strip()
-                    )
+                    degree = school.find_element(By.CSS_SELECTOR,"span.t-14").text.strip()
                     times = (
-                        school.find_element(By.CLASS_NAME,"pv-entity__dates")
-                        .find_elements(By.TAG_NAME,"span")[1]
-                        .text.strip()
+                        school.find_element(By.CSS_SELECTOR,"span.t-14.t-black--light").text.strip().split('-')
                     )
                     from_date, to_date = (times.split(" ")[0], times.split(" ")[2])
                 except:
@@ -248,22 +236,17 @@ class Person(Scraper):
         # get interest
         try:
 
-            _ = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
-                EC.presence_of_element_located(
+            interests = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
+                EC.presence_of_all_elements_located(
                     (
-                        By.XPATH,
-                        "//*[@class='pv-profile-section pv-interests-section artdeco-container-card artdeco-card ember-view']",
+                        By.CSS_SELECTOR,
+                        "#interests + div + div div.pvs-list__outer-container li.artdeco-list__item",
                     )
                 )
             )
-            interestContainer = driver.find_element(By.XPATH,
-                "//*[@class='pv-profile-section pv-interests-section artdeco-container-card artdeco-card ember-view']"
-            )
-            for interestElement in interestContainer.find_elements(By.XPATH,
-                "//*[@class='pv-interest-entity pv-profile-section__card-item ember-view']"
-            ):
+            for interestElement in interests:
                 interest = Interest(
-                    interestElement.find_element(By.TAG_NAME,"h3").text.strip()
+                    interestElement.find_element(By.CSS_SELECTOR,"span.mr1").text.strip()
                 )
                 self.add_interest(interest)
         except:

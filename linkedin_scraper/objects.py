@@ -26,12 +26,9 @@ class Institution:
 
 @dataclass
 class Experience(Institution):
-    from_date: str = None
-    to_date: str = None
     description: str = None
     position_title: str = None
     duration: str = None
-    location: str = None
 
 
 @dataclass
