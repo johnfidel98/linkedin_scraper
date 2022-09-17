@@ -14,6 +14,12 @@ class Contact:
 
 
 @dataclass
+class Skill:
+    name: str = None
+    endorsements: int = None
+
+
+@dataclass
 class Institution:
     institution_name: str = None
     website: str = None
@@ -41,12 +47,6 @@ class Education(Institution):
 
 @dataclass
 class Interest(Institution):
-    title = None
-
-
-@dataclass
-class Accomplishment(Institution):
-    category = None
     title = None
 
 

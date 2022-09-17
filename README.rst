@@ -118,7 +118,7 @@ A Person object can be created with the following inputs:
 
 .. code-block:: python
 
-   Person(linkedin_url=None, name=None, about=[], experiences=[], educations=[], interests=[], accomplishments=[], company=None, job_title=None, driver=None, scrape=True)
+   Person(linkedin_url=None, name=None, about=[], experiences=[], educations=[], interests=[], skills=[], company=None, job_title=None, driver=None, scrape=True)
 
 ``linkedin_url``
 ~~~~~~~~~~~~~~~~~~~~
@@ -150,10 +150,6 @@ This is the past educations they have. A list of ``linkedin_scraper.scraper.Educ
 
 This is the interests they have. A list of ``linkedin_scraper.scraper.Interest``
 
-``accomplishment``
-~~~~~~~~~~~~~~~~~~~~~~
-
-This is the accomplishments they have. A list of ``linkedin_scraper.scraper.Accomplishment``
 
 ``company``
 ^^^^^^^^^^^^^^^

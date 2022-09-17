@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from .objects import Experience, Education, Scraper, Interest, Accomplishment, Contact
+from .objects import Experience, Education, Scraper, Interest, Contact, Skill
 import os
 from linkedin_scraper import selectors
 
@@ -20,8 +20,8 @@ class Person(Scraper):
         about=None,
         experiences=None,
         educations=None,
+        skills=None,
         interests=None,
-        accomplishments=None,
         company=None,
         job_title=None,
         contacts=None,
@@ -36,9 +36,9 @@ class Person(Scraper):
         self.experiences = experiences or []
         self.educations = educations or []
         self.interests = interests or []
-        self.accomplishments = accomplishments or []
         self.also_viewed_urls = []
         self.contacts = contacts or []
+        self.skills = skills or []
 
         if driver is None:
             try:
@@ -72,9 +72,9 @@ class Person(Scraper):
 
     def add_interest(self, interest):
         self.interests.append(interest)
-
-    def add_accomplishment(self, accomplishment):
-        self.accomplishments.append(accomplishment)
+    
+    def add_skill(self, interest):
+        self.skills.append(interest)
 
     def add_location(self, location):
         self.location = location
@@ -118,12 +118,7 @@ class Person(Scraper):
         # get about
         try:
             see_more = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
-                EC.presence_of_element_located(
-                    (
-                        By.XPATH,
-                        "//*[@class='inline-show-more-text__button']",
-                    )
-                )
+                EC.presence_of_element_located((By.CSS_SELECTOR, "#about + div + div.ph5 button"))
             )
             driver.execute_script("arguments[0].click();", see_more)
 
@@ -131,7 +126,7 @@ class Person(Scraper):
                 EC.presence_of_element_located(
                     (
                         By.CSS_SELECTOR,
-                        "#ember74 .pv-shared-text-with-see-more",
+                        "#about + div + div.ph5",
                     )
                 )
             )
@@ -167,10 +162,9 @@ class Person(Scraper):
         """
 
         try:
-            _ = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
+            exp = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
                 EC.presence_of_element_located((By.ID, "experience"))
             )
-            exp = driver.find_element(By.ID, "experience")
         except:
             exp = None
 
@@ -192,8 +186,7 @@ class Person(Scraper):
                 self.add_experience(experience)
 
         # get location
-        location = driver.find_element(By.CLASS_NAME, f"{self.__TOP_CARD}--list-bullet")
-        location = location.find_element(By.TAG_NAME,"li").text
+        location = driver.find_element(By.CSS_SELECTOR, "div.pb2:has(> span.text-body-small) span.text-body-small").text
         self.add_location(location)
 
         driver.execute_script(
@@ -214,7 +207,7 @@ class Person(Scraper):
             for school in edu.find_elements(By.CSS_SELECTOR,
                 "#education + div + div.pvs-list__outer-container li.artdeco-list__item"
             ):
-                university = school.find_element(By.CLASS_NAME,
+                university = school.find_element(By.CSS_SELECTOR,
                     "span.mr1"
                 ).text.strip()
 
@@ -252,49 +245,25 @@ class Person(Scraper):
         except:
             pass
 
-        # get accomplishment
+        # get skills
         try:
-            _ = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
-                EC.presence_of_element_located(
-                    (
-                        By.XPATH,
-                        "//*[@class='pv-profile-section pv-accomplishments-section artdeco-container-card artdeco-card ember-view']",
-                    )
+            skills = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
+                EC.presence_of_element_located((By.ID, "skills"))
+            )
+        except:
+            skills = None
+        if skills:
+            for skill_block in driver.find_elements(By.CSS_SELECTOR, "#skills + div + div div.pvs-entity"):
+                skill_name = skill_block.find_element(By.CSS_SELECTOR, "span.mr1").text.strip()
+
+                try:
+                    endorsements = skill_block.find_element(By.CSS_SELECTOR, "li:last-child .t-14").text.strip()
+                except:
+                    endorsements = None
+                skill = Skill(
+                    name=skill_name, endorsements=endorsements
                 )
-            )
-            acc = driver.find_element(By.XPATH,
-                "//*[@class='pv-profile-section pv-accomplishments-section artdeco-container-card artdeco-card ember-view']"
-            )
-            for block in acc.find_elements(By.XPATH,
-                "//div[@class='pv-accomplishments-block__content break-words']"
-            ):
-                category = block.find_element(By.TAG_NAME,"h3")
-                for title in block.find_element(By.TAG_NAME,
-                    "ul"
-                ).find_elements(By.TAG_NAME,"li"):
-                    accomplishment = Accomplishment(category.text, title.text)
-                    self.add_accomplishment(accomplishment)
-        except:
-            pass
-
-        # get connections
-        try:
-            driver.get("https://www.linkedin.com/mynetwork/invite-connect/connections/")
-            _ = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "mn-connections"))
-            )
-            connections = driver.find_element(By.CLASS_NAME,"mn-connections")
-            if connections is not None:
-                for conn in connections.find_elements(By.CLASS_NAME,"mn-connection-card"):
-                    anchor = conn.find_element(By.CLASS_NAME,"mn-connection-card__link")
-                    url = anchor.get_attribute("href")
-                    name = conn.find_element(By.CLASS_NAME,"mn-connection-card__details").find_element(By.CLASS_NAME, "mn-connection-card__name").text.strip()
-                    occupation = conn.find_element(By.CLASS_NAME,"mn-connection-card__details").find_element(By.CLASS_NAME, "mn-connection-card__occupation").text.strip()
-
-                    contact = Contact(name=name, occupation=occupation, url=url)
-                    self.add_contact(contact)
-        except:
-            connections = None
+                self.add_skill(skill)
 
         if close_on_complete:
             driver.quit()
@@ -416,12 +385,11 @@ class Person(Scraper):
             return None
 
     def __repr__(self):
-        return "{name}\n\nAbout\n{about}\n\nExperience\n{exp}\n\nEducation\n{edu}\n\nInterest\n{int}\n\nAccomplishments\n{acc}\n\nContacts\n{conn}".format(
+        return "{name}\n\nAbout\n{about}\n\nExperience\n{exp}\n\nEducation\n{edu}\n\nInterest\n{int}\n\nSkills\n{skil}".format(
             name=self.name,
             about=self.about,
             exp=self.experiences,
             edu=self.educations,
             int=self.interests,
-            acc=self.accomplishments,
-            conn=self.contacts,
+            skil=self.skills,
         )
