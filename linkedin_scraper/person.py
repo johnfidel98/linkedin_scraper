@@ -1,9 +1,8 @@
-import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from .objects import Experience, Education, Scraper, Interest, Contact, Skill
+from .objects import Experience, Education, Scraper, Interest, Skill
 import os
 from linkedin_scraper import selectors
 
