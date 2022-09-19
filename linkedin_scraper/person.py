@@ -169,11 +169,11 @@ class Person(Scraper):
 
         if exp is not None:
             for position in driver.find_elements(By.CSS_SELECTOR, "#experience + div + div.pvs-list__outer-container li.artdeco-list__item"):
-                position_title = position.find_element(By.CSS_SELECTOR,"span.mr1").text.strip()
+                position_title = position.find_element(By.CSS_SELECTOR,"span.mr1 span").text.strip()
 
                 try:
-                    company = position.find_element(By.CSS_SELECTOR,"span.t-14").text.strip()
-                    duration = position.find_element(By.CSS_SELECTOR,"span.t-14.t-black--light").text.strip()
+                    company = position.find_element(By.CSS_SELECTOR,"span.t-14 span").text.strip()
+                    duration = position.find_element(By.CSS_SELECTOR,"span.t-14.t-black--light span").text.strip()
                 except:
                     company, duration = None, None
 
@@ -207,13 +207,13 @@ class Person(Scraper):
                 "#education + div + div.pvs-list__outer-container li.artdeco-list__item"
             ):
                 university = school.find_element(By.CSS_SELECTOR,
-                    "span.mr1"
+                    "span.mr1 span"
                 ).text.strip()
 
                 try:
-                    degree = school.find_element(By.CSS_SELECTOR,"span.t-14").text.strip()
+                    degree = school.find_element(By.CSS_SELECTOR,"span.t-14 span").text.strip()
                     times = (
-                        school.find_element(By.CSS_SELECTOR,"span.t-14.t-black--light").text.strip().split('-')
+                        school.find_element(By.CSS_SELECTOR,"span.t-14.t-black--light span").text.strip().split('-')
                     )
                     from_date, to_date = (times.split(" ")[0], times.split(" ")[2])
                 except:
@@ -237,10 +237,10 @@ class Person(Scraper):
                 )
             )
             for interestElement in interests:
-                interest = Interest(
-                    interestElement.find_element(By.CSS_SELECTOR,"span.mr1").text.strip()
-                )
-                self.add_interest(interest)
+                interest_itm = interestElement.find_element(By.CSS_SELECTOR,"span.mr1 span").text.strip()
+                if interest_itm:
+                    interest = Interest(interest_itm)
+                    self.add_interest(interest)
         except:
             pass
 
@@ -253,10 +253,10 @@ class Person(Scraper):
             skills = None
         if skills:
             for skill_block in driver.find_elements(By.CSS_SELECTOR, "#skills + div + div div.pvs-entity"):
-                skill_name = skill_block.find_element(By.CSS_SELECTOR, "span.mr1").text.strip()
+                skill_name = skill_block.find_element(By.CSS_SELECTOR, "span.mr1 span").text.strip()
 
                 try:
-                    endorsements = skill_block.find_element(By.CSS_SELECTOR, "li:last-child .t-14").text.strip()
+                    endorsements = skill_block.find_element(By.CSS_SELECTOR, "li:last-child .t-14 span").text.strip()
                 except:
                     endorsements = None
                 skill = Skill(

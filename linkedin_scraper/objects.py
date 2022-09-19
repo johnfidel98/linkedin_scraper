@@ -22,17 +22,10 @@ class Skill:
 @dataclass
 class Institution:
     institution_name: str = None
-    website: str = None
-    industry: str = None
-    type: str = None
-    headquarters: str = None
-    company_size: int = None
-    founded: int = None
 
 
 @dataclass
 class Experience(Institution):
-    description: str = None
     position_title: str = None
     duration: str = None
 
@@ -41,12 +34,11 @@ class Experience(Institution):
 class Education(Institution):
     from_date: str = None
     to_date: str = None
-    description: str = None
     degree: str = None
 
 
 @dataclass
-class Interest(Institution):
+class Interest:
     title = None
 
 
