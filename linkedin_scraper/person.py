@@ -203,32 +203,32 @@ class Person(Scraper):
         except:
             edu = None
         if edu:
-            for school in edu.find_elements(By.CSS_SELECTOR,
+            for school in driver.find_elements(By.CSS_SELECTOR,
                 "#education + div + div.pvs-list__outer-container li.artdeco-list__item"
             ):
                 university = school.find_element(By.CSS_SELECTOR,
                     "span.mr1 span"
                 ).text.strip()
 
-                try:
-                    degree = school.find_element(By.CSS_SELECTOR,"span.t-14 span").text.strip()
-                    times = (
-                        school.find_element(By.CSS_SELECTOR,"span.t-14.t-black--light span").text.strip().split('-')
+                if university:
+                    try:
+                        degree = school.find_element(By.CSS_SELECTOR,"span.t-14 span").text.strip()
+                        times = school.find_element(By.CSS_SELECTOR,"span.t-14.t-black--light span").text.strip().split('-')
+                        
+                        from_date, to_date = times[0].strip(), times[1].strip()
+                    except:
+                        degree = None
+                        from_date, to_date = None, None
+                    education = Education(
+                        from_date=from_date, to_date=to_date, degree=degree
                     )
-                    from_date, to_date = (times.split(" ")[0], times.split(" ")[2])
-                except:
-                    degree = None
-                    from_date, to_date = (None, None)
-                education = Education(
-                    from_date=from_date, to_date=to_date, degree=degree
-                )
-                education.institution_name = university
-                self.add_education(education)
+                    education.institution_name = university
+                    self.add_education(education)
 
         # get interest
         try:
 
-            interests = WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
+            WebDriverWait(driver, self.__WAIT_FOR_ELEMENT_TIMEOUT).until(
                 EC.presence_of_all_elements_located(
                     (
                         By.CSS_SELECTOR,
@@ -236,10 +236,12 @@ class Person(Scraper):
                     )
                 )
             )
-            for interestElement in interests:
+            for interestElement in driver.find_elements(By.CSS_SELECTOR,
+                "#interests + div + div div.pvs-list__outer-container li.artdeco-list__item"
+            ):
                 interest_itm = interestElement.find_element(By.CSS_SELECTOR,"span.mr1 span").text.strip()
                 if interest_itm:
-                    interest = Interest(interest_itm)
+                    interest = Interest(title=interest_itm)
                     self.add_interest(interest)
         except:
             pass
@@ -384,11 +386,7 @@ class Person(Scraper):
             return None
 
     def __repr__(self):
-        return "{name}\n\nAbout\n{about}\n\nExperience\n{exp}\n\nEducation\n{edu}\n\nInterest\n{int}\n\nSkills\n{skil}".format(
-            name=self.name,
-            about=self.about,
-            exp=self.experiences,
-            edu=self.educations,
-            int=self.interests,
-            skil=self.skills,
+        return "{name}\n\nAbout\n{about}\n\nLocation\n{loc}\n\nExperience\n{exp}\n\nEducation\n{edu}\n\nInterest\n{intr}\n\nSkills\n{skil}".format(
+            name=self.name, loc=self.location, about=self.about, exp=self.experiences,
+            edu=self.educations, intr=self.interests, skil=self.skills,
         )
